@@ -1,4 +1,10 @@
 import os
+
+print("FB_EMAIL:", os.getenv("FB_EMAIL"))
+print("FB_PASSWORD:", os.getenv("FB_PASSWORD"))
+print("GROUP_URL:", os.getenv("GROUP_URL"))
+print("PAGE_URL:", os.getenv("PAGE_URL"))
+
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
