@@ -1,65 +1,55 @@
-import time
 import os
-import chromedriver_autoinstaller
+import time
+from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
 
-# تثبيت ChromeDriver تلقائيًا
-chromedriver_autoinstaller.install()
+# تحميل المتغيرات البيئية
+load_dotenv()
 
-# جلب المتغيرات من بيئة Railway
 FB_EMAIL = os.getenv("FB_EMAIL")
 FB_PASSWORD = os.getenv("FB_PASSWORD")
-PAGE_URL = os.getenv("PAGE_URL")
-GROUP_URL = os.getenv("GROUP_URL")
 
-# إعداد المتصفح
-options = webdriver.ChromeOptions()
+# التأكد من تحميل القيم
+if not FB_EMAIL or not FB_PASSWORD:
+    raise ValueError("⚠️ خطأ: لم يتم تحميل FB_EMAIL أو FB_PASSWORD بشكل صحيح!")
+
+# إعداد خيارات المتصفح
+options = Options()
 options.add_argument("--headless")  # تشغيل بدون واجهة
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
+# تشغيل WebDriver
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 def login():
-    """تسجيل الدخول إلى فيسبوك"""
+    """تسجيل الدخول إلى Facebook"""
     driver.get("https://www.facebook.com/")
+
+    # الانتظار حتى يتم تحميل الصفحة
     time.sleep(3)
 
-    driver.find_element(By.ID, "email").send_keys(FB_EMAIL)
-    driver.find_element(By.ID, "pass").send_keys(FB_PASSWORD)
-    driver.find_element(By.NAME, "login").click()
+    # البحث عن حقول الإدخال وإدخال البيانات
+    email_input = driver.find_element(By.ID, "email")
+    password_input = driver.find_element(By.ID, "pass")
+    login_button = driver.find_element(By.NAME, "login")
+
+    email_input.send_keys(FB_EMAIL)
+    password_input.send_keys(FB_PASSWORD)
+    login_button.click()
+
+    # الانتظار قليلاً بعد تسجيل الدخول
     time.sleep(5)
+    print("✅ تم تسجيل الدخول بنجاح!")
 
-def switch_to_page():
-    """التبديل إلى الصفحة الإدارية"""
-    driver.get(PAGE_URL)
-    time.sleep(5)
-
-def post_to_group():
-    """النشر في المجموعة باستخدام الصفحة"""
-    driver.get(GROUP_URL)
-    time.sleep(5)
-
-    post_box = driver.find_element(By.CSS_SELECTOR, '[aria-label="اكتب شيئًا..."]')
-    post_box.click()
-    time.sleep(2)
-
-    post_box.send_keys("🚀 هذا منشور تلقائي من صفحتي!")
-    time.sleep(2)
-
-    post_button = driver.find_element(By.XPATH, '//span[contains(text(),"نشر")]')
-    post_button.click()
-    time.sleep(5)
-
-    print("✅ تم النشر بنجاح!")
-
-# تشغيل البوت
-login()
-switch_to_page()
-post_to_group()
-
-driver.quit()
+# تنفيذ عملية تسجيل الدخول
+try:
+    login()
+except Exception as e:
+    print(f"❌ خطأ أثناء تسجيل الدخول: {e}")
+finally:
+    driver.quit()
