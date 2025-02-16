@@ -16,6 +16,14 @@ GROUP_URL = os.getenv("GROUP_URL")
 PAGE_URL = os.getenv("PAGE_URL")
 POST_CONTENT = os.getenv("POST_CONTENT")
 
+
+print(f"FB_EMAIL: {FB_EMAIL}")
+print(f"FB_PASSWORD: {FB_PASSWORD}")
+print(f"GROUP_URL: {GROUP_URL}")
+print(f"PAGE_URL: {PAGE_URL}")
+print(f"POST_CONTENT: {POST_CONTENT}")
+
+
 if not all([FB_EMAIL, FB_PASSWORD, GROUP_URL, PAGE_URL, POST_CONTENT]):
     raise ValueError("❌ يرجى ضبط جميع متغيرات البيئة المطلوبة.")
 
