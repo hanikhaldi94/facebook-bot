@@ -1,55 +1,59 @@
 import os
 import time
-from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 
-# تحميل المتغيرات البيئية
-load_dotenv()
-
+# استرجاع القيم من متغيرات البيئة
 FB_EMAIL = os.getenv("FB_EMAIL")
 FB_PASSWORD = os.getenv("FB_PASSWORD")
+PAGE_URL = os.getenv("PAGE_URL")
+GROUP_URL = os.getenv("GROUP_URL")
 
-# التأكد من تحميل القيم
-if not FB_EMAIL or not FB_PASSWORD:
-    raise ValueError("⚠️ خطأ: لم يتم تحميل FB_EMAIL أو FB_PASSWORD بشكل صحيح!")
+# تأكد من أن جميع المتغيرات موجودة
+if not all([FB_EMAIL, FB_PASSWORD, PAGE_URL, GROUP_URL]):
+    raise ValueError("يرجى ضبط جميع متغيرات البيئة المطلوبة.")
 
-# إعداد خيارات المتصفح
+# إعداد Selenium
 options = Options()
-options.add_argument("--headless")  # تشغيل بدون واجهة
+options.add_argument("--headless")  # تشغيل بدون واجهة رسومية
+options.add_argument("--disable-gpu")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
-# تشغيل WebDriver
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 def login():
-    """تسجيل الدخول إلى Facebook"""
     driver.get("https://www.facebook.com/")
-
-    # الانتظار حتى يتم تحميل الصفحة
     time.sleep(3)
-
-    # البحث عن حقول الإدخال وإدخال البيانات
-    email_input = driver.find_element(By.ID, "email")
-    password_input = driver.find_element(By.ID, "pass")
-    login_button = driver.find_element(By.NAME, "login")
-
-    email_input.send_keys(FB_EMAIL)
-    password_input.send_keys(FB_PASSWORD)
-    login_button.click()
-
-    # الانتظار قليلاً بعد تسجيل الدخول
+    driver.find_element(By.ID, "email").send_keys(FB_EMAIL)
+    driver.find_element(By.ID, "pass").send_keys(FB_PASSWORD)
+    driver.find_element(By.ID, "pass").send_keys(Keys.RETURN)
     time.sleep(5)
     print("✅ تم تسجيل الدخول بنجاح!")
 
-# تنفيذ عملية تسجيل الدخول
-try:
-    login()
-except Exception as e:
-    print(f"❌ خطأ أثناء تسجيل الدخول: {e}")
-finally:
-    driver.quit()
+def post_to_group():
+    driver.get(GROUP_URL)
+    time.sleep(5)
+    
+    try:
+        post_box = driver.find_element(By.CSS_SELECTOR, "div[role='textbox']")
+        post_box.click()
+        time.sleep(2)
+        post_box.send_keys("هذا منشور تجريبي من البوت! 🤖")
+        time.sleep(2)
+        post_box.send_keys(Keys.CONTROL, Keys.ENTER)
+        time.sleep(5)
+        print("✅ تم نشر المنشور في المجموعة!")
+    except Exception as e:
+        print(f"❌ فشل النشر: {e}")
+
+if __name__ == "__main__":
+    try:
+        login()
+        post_to_group()
+    finally:
+        driver.quit()
