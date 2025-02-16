@@ -4,79 +4,58 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from dotenv import load_dotenv
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-# تحميل متغيرات البيئة
-load_dotenv()
-
+# ✅ جلب متغيرات البيئة
 FB_EMAIL = os.getenv("FB_EMAIL")
 FB_PASSWORD = os.getenv("FB_PASSWORD")
 GROUP_URL = os.getenv("GROUP_URL")
 PAGE_URL = os.getenv("PAGE_URL")
-POST_CONTENT = os.getenv("POST_CONTENT")
+POST_CONTENT = "هذا منشور تجريبي من البوت 🚀"
 
-
-print(f"FB_EMAIL: {FB_EMAIL}")
-print(f"FB_PASSWORD: {FB_PASSWORD}")
-print(f"GROUP_URL: {GROUP_URL}")
-print(f"PAGE_URL: {PAGE_URL}")
-print(f"POST_CONTENT: {POST_CONTENT}")
-
-
-if not all([FB_EMAIL, FB_PASSWORD, GROUP_URL, PAGE_URL, POST_CONTENT]):
+# ✅ التحقق من أن جميع المتغيرات مضبوطة
+if not all([FB_EMAIL, FB_PASSWORD, GROUP_URL, PAGE_URL]):
     raise ValueError("❌ يرجى ضبط جميع متغيرات البيئة المطلوبة.")
 
-# إعداد المتصفح (Google Chrome)
-options = webdriver.ChromeOptions()
-options.add_argument("--headless")  # تشغيل بدون واجهة رسومية
-options.add_argument("--disable-gpu")
-options.add_argument("--window-size=1920,1080")
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
+# ✅ إعداد متصفح Chrome للعمل بدون واجهة رسومية (Headless Mode)
+chrome_options = Options()
+chrome_options.add_argument("--headless")  # تشغيل بدون واجهة
+chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
 
-service = Service(ChromeDriverManager().install())
-driver = webdriver.Chrome(service=service, options=options)
+# ✅ تشغيل المتصفح
+service = Service("/usr/bin/chromedriver")  # تأكد من أن chromedriver مثبت
+driver = webdriver.Chrome(service=service, options=chrome_options)
 
-# تسجيل الدخول إلى Facebook
-def login():
-    driver.get("https://www.facebook.com/")
-    time.sleep(3)
-
-    driver.find_element(By.ID, "email").send_keys(FB_EMAIL)
+try:
+    # ✅ تسجيل الدخول إلى فيسبوك
+    driver.get("https://www.facebook.com")
+    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "email"))).send_keys(FB_EMAIL)
     driver.find_element(By.ID, "pass").send_keys(FB_PASSWORD)
-    driver.find_element(By.ID, "pass").send_keys(Keys.RETURN)
-    
-    time.sleep(5)  # انتظار تحميل الصفحة بعد تسجيل الدخول
-
+    driver.find_element(By.NAME, "login").click()
     print("✅ تم تسجيل الدخول بنجاح!")
 
-# نشر منشور في مجموعة
-def post_to_group():
+    # ✅ الذهاب إلى المجموعة
+    time.sleep(5)  # انتظار تحميل الصفحة
     driver.get(GROUP_URL)
-    time.sleep(5)
+    print("🔹 فتح المجموعة:", GROUP_URL)
 
-    try:
-        post_box = driver.find_element(By.XPATH, "//div[@role='textbox']")
-        post_box.click()
-        time.sleep(2)
+    # ✅ الانتظار حتى يظهر مربع الكتابة
+    wait = WebDriverWait(driver, 10)
+    post_box = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@role='textbox']")))
 
-        post_box.send_keys(POST_CONTENT)
-        time.sleep(2)
+    # ✅ كتابة المنشور وإرساله
+    post_box.click()
+    post_box.send_keys(POST_CONTENT)
+    time.sleep(2)  # انتظار قليل
+    post_box.send_keys(Keys.CONTROL, Keys.ENTER)  # إرسال المنشور
+    print("✅ تم نشر المنشور بنجاح!")
 
-        post_button = driver.find_element(By.XPATH, "//div[@aria-label='Post']")
-        post_button.click()
-        
-        time.sleep(5)
-        print("✅ تم نشر المنشور في المجموعة بنجاح!")
+except Exception as e:
+    print("❌ حدث خطأ:", str(e))
 
-    except Exception as e:
-        print(f"❌ فشل نشر المنشور: {e}")
-
-# تنفيذ البوت
-if __name__ == "__main__":
-    try:
-        login()
-        post_to_group()
-    finally:
-        driver.quit()
+finally:
+    driver.quit()  # ✅ إغلاق المتصفح
