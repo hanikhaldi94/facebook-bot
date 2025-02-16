@@ -1,62 +1,71 @@
 import os
-
-print("FB_EMAIL:", os.getenv("FB_EMAIL"))
-print("FB_PASSWORD:", os.getenv("FB_PASSWORD"))
-print("GROUP_URL:", os.getenv("GROUP_URL"))
-print("PAGE_URL:", os.getenv("PAGE_URL"))
-
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.options import Options
+from dotenv import load_dotenv
 
-# استرجاع القيم من متغيرات البيئة
+# تحميل متغيرات البيئة
+load_dotenv()
+
 FB_EMAIL = os.getenv("FB_EMAIL")
 FB_PASSWORD = os.getenv("FB_PASSWORD")
-PAGE_URL = os.getenv("PAGE_URL")
 GROUP_URL = os.getenv("GROUP_URL")
+PAGE_URL = os.getenv("PAGE_URL")
+POST_CONTENT = os.getenv("POST_CONTENT")
 
-# تأكد من أن جميع المتغيرات موجودة
-if not all([FB_EMAIL, FB_PASSWORD, PAGE_URL, GROUP_URL]):
-    raise ValueError("يرجى ضبط جميع متغيرات البيئة المطلوبة.")
+if not all([FB_EMAIL, FB_PASSWORD, GROUP_URL, PAGE_URL, POST_CONTENT]):
+    raise ValueError("❌ يرجى ضبط جميع متغيرات البيئة المطلوبة.")
 
-# إعداد Selenium
-options = Options()
+# إعداد المتصفح (Google Chrome)
+options = webdriver.ChromeOptions()
 options.add_argument("--headless")  # تشغيل بدون واجهة رسومية
 options.add_argument("--disable-gpu")
+options.add_argument("--window-size=1920,1080")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+service = Service(ChromeDriverManager().install())
+driver = webdriver.Chrome(service=service, options=options)
 
+# تسجيل الدخول إلى Facebook
 def login():
     driver.get("https://www.facebook.com/")
     time.sleep(3)
+
     driver.find_element(By.ID, "email").send_keys(FB_EMAIL)
     driver.find_element(By.ID, "pass").send_keys(FB_PASSWORD)
     driver.find_element(By.ID, "pass").send_keys(Keys.RETURN)
-    time.sleep(5)
+    
+    time.sleep(5)  # انتظار تحميل الصفحة بعد تسجيل الدخول
+
     print("✅ تم تسجيل الدخول بنجاح!")
 
+# نشر منشور في مجموعة
 def post_to_group():
     driver.get(GROUP_URL)
     time.sleep(5)
-    
+
     try:
-        post_box = driver.find_element(By.CSS_SELECTOR, "div[role='textbox']")
+        post_box = driver.find_element(By.XPATH, "//div[@role='textbox']")
         post_box.click()
         time.sleep(2)
-        post_box.send_keys("هذا منشور تجريبي من البوت! 🤖")
-        time.sleep(2)
-        post_box.send_keys(Keys.CONTROL, Keys.ENTER)
-        time.sleep(5)
-        print("✅ تم نشر المنشور في المجموعة!")
-    except Exception as e:
-        print(f"❌ فشل النشر: {e}")
 
+        post_box.send_keys(POST_CONTENT)
+        time.sleep(2)
+
+        post_button = driver.find_element(By.XPATH, "//div[@aria-label='Post']")
+        post_button.click()
+        
+        time.sleep(5)
+        print("✅ تم نشر المنشور في المجموعة بنجاح!")
+
+    except Exception as e:
+        print(f"❌ فشل نشر المنشور: {e}")
+
+# تنفيذ البوت
 if __name__ == "__main__":
     try:
         login()
