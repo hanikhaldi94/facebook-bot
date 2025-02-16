@@ -1,11 +1,14 @@
-
 import time
 import os
+import chromedriver_autoinstaller
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+
+# تثبيت ChromeDriver تلقائيًا
+chromedriver_autoinstaller.install()
 
 # جلب المتغيرات من بيئة Railway
 FB_EMAIL = os.getenv("FB_EMAIL")
@@ -41,16 +44,13 @@ def post_to_group():
     driver.get(GROUP_URL)
     time.sleep(5)
 
-    # البحث عن مربع الكتابة
     post_box = driver.find_element(By.CSS_SELECTOR, '[aria-label="اكتب شيئًا..."]')
     post_box.click()
     time.sleep(2)
 
-    # كتابة المنشور
     post_box.send_keys("🚀 هذا منشور تلقائي من صفحتي!")
     time.sleep(2)
 
-    # النقر على زر النشر
     post_button = driver.find_element(By.XPATH, '//span[contains(text(),"نشر")]')
     post_button.click()
     time.sleep(5)
