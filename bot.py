@@ -34,7 +34,7 @@ chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 
 # ✅ تشغيل المتصفح
-service = Service("/usr/local/bin/chromedriver")  # تأكد من المسار الصحيح لـ ChromeDriver
+service = Service(chromedriver_autoinstaller.install())  # تأكد من المسار الصحيح لـ ChromeDriver
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
 try:
