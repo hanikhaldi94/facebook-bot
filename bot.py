@@ -51,12 +51,19 @@ try:
     # انتظار التحميل الكامل للصفحة
     time.sleep(5)
 
-    # التبديل إلى الصفحة (إن كانت هذه هي صفحة المستخدم)
+    # التبديل إلى الصفحة باستخدام JavaScript
     try:
-        switch_button = driver.find_element(By.XPATH, '//div[contains(text(),"تبديل الآن")]')
-        switch_button.click()
+        driver.execute_script('''
+            let buttons = document.querySelectorAll('span');
+            for (let btn of buttons) {
+                if (btn.innerText.includes("تبديل الآن")) {
+                    btn.click();
+                    break;
+                }
+            }
+        ''')
         time.sleep(5)
-        print("تم التبديل إلى الصفحة بنجاح.")
+        print("✅ تم التبديل إلى الصفحة بنجاح.")
     except Exception as e:
         print(f"❌ خطأ أثناء التبديل للصفحة: {e}")
 
@@ -70,7 +77,7 @@ try:
     WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'div[aria-label="نشر"]'))).click()
 
     time.sleep(5)  # الانتظار قليلاً للتأكد من نشر المنشور
-    print("تم نشر المنشور بنجاح!")
+    print("✅ تم نشر المنشور بنجاح!")
 
 except Exception as e:
     print(f"❌ خطأ أثناء التشغيل: {e}")
