@@ -30,7 +30,6 @@ POST_CONTENT = "هذا هو المحتوى الذي سيتم نشره في ال�
 options = webdriver.ChromeOptions()
 options.add_argument("--headless")  # لتشغيل المتصفح بدون واجهة رسومية
 options.add_argument("--no-sandbox")  # لتجنب مشاكل في بيئات الحاويات مثل Docker
-options.add_argument("--disable-dev-shm-usage")  # لتحسين الأداء في بيئات مثل Railway
 
 # تحديد مجلد بيانات المستخدم الفريد باستخدام uuid لضمان أنه لا يتكرر
 user_data_dir = f"/tmp/chrome_user_data_{uuid.uuid4().hex}"
@@ -43,10 +42,14 @@ os.makedirs(user_data_dir)  # إنشاء المجلد الفريد
 
 options.add_argument(f"--user-data-dir={user_data_dir}")
 
+# إعداد الـ WebDriver مع الخيارات
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
-# تحميل الكوكيز
+# تحميل الكوكيز بعد التأكد من تحميل الصفحة بشكل كامل
 driver.get("https://www.facebook.com/")  # فتح الفيسبوك أولاً
+WebDriverWait(driver, 20).until(
+    EC.presence_of_element_located((By.CSS_SELECTOR, "body"))
+)  # تأكد من تحميل الصفحة
 for cookie in FB_COOKIES:
     driver.add_cookie(cookie)
 
