@@ -1,11 +1,12 @@
 {
   "name": "facebook-bot",
   "version": "1.0.0",
+  "description": "Facebook bot using Puppeteer",
   "main": "bot.js",
-  "dependencies": {
-    "puppeteer-core": "^19.0.0"
-  },
   "scripts": {
     "start": "node bot.js"
+  },
+  "dependencies": {
+    "puppeteer-core": "^20.0.0"  // تأكد من تثبيت النسخة الصحيحة لـ puppeteer-core
   }
 }
