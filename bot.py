@@ -83,9 +83,13 @@ try:
     post_id_script = """
     let post = document.querySelector('[role="feed"]');
     if (post) {
-        let postId = post.querySelector('a[href*="posts/"]')?.href.split('/').pop();
-        return postId;
+        let postLink = post.querySelector('a[href*="posts/"]');
+        if (postLink) {
+            let postId = postLink.href.split('/').pop();
+            return postId;
+        }
     }
+    return null;
     """
     post_id = driver.execute_script(post_id_script)
     print(f"ID المنشور: {post_id}")
