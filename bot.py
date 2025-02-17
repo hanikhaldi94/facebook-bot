@@ -1,4 +1,5 @@
 import time
+import tempfile
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -6,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-# ✅ تعريف الكوكيز (للتجربة، لاحقًا ضعها في env)
+# تعريف الكوكيز الخاصة بفيسبوك (استبدل القيم بكوكيزك الفعلية)
 FB_COOKIES = [
     {"name": "c_user", "value": "100005694367110", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
     {"name": "xs", "value": "24%3AOtkShu0keCrL3A%3A2%3A1739742595%3A-1%3A1051%3A%3AAcU55dwuLfb9kOjznYaChsdoykCbrAYMnTaEBERD1Q", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
@@ -15,82 +16,65 @@ FB_COOKIES = [
     {"name": "datr", "value": "_X1rZXLEnaiQ1InGXamm_2lM", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
 ]
 
-# ✅ رابط الصفحة مباشرة
-PAGE_URL = "https://www.facebook.com/YOUR_PAGE_URL_HERE"  # ضع رابط الصفحة هنا
+# الرابط الخاص بالصفحة والمجموعة
+PAGE_URL = "https://www.facebook.com/profile.php?id=61564136097717"
 GROUP_URL = "https://www.facebook.com/groups/2698034130415038/"
-POST_CONTENT = "🚀 هذا منشور تجريبي للنشر باسم الصفحة!"
+POST_CONTENT = "هذا هو المحتوى الذي سيتم نشره في المجموعة."
 
-# ✅ إعداد WebDriver
+# إعدادات WebDriver
 options = webdriver.ChromeOptions()
 options.add_argument("--disable-gpu")
 options.add_argument("--disable-dev-shm-usage")
-options.add_argument("--disable-software-rasterizer")
 options.add_argument("--no-sandbox")
-options.add_argument("--headless")  # تشغيل بدون واجهة (يمكن تعطيله للاختبار)
+options.add_argument("window-size=1920x1080")  # ضبط نافذة المتصفح
 
-# ✅ تشغيل المتصفح
+# استخدام مجلد مؤقت لتخزين البيانات
+user_data_dir = tempfile.mkdtemp()
+options.add_argument(f"--user-data-dir={user_data_dir}")
+options.add_argument("--headless")  # إذا كنت تحتاج إلى تشغيل المتصفح بدون واجهة
+
+# تشغيل المتصفح
 try:
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
-    # ✅ فتح فيسبوك وتحميل الكوكيز
+    # فتح صفحة فيسبوك وتسجيل الدخول باستخدام الكوكيز
     driver.get("https://www.facebook.com/")
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, "body")))
 
     for cookie in FB_COOKIES:
         driver.add_cookie(cookie)
 
-    # ✅ تحديث الصفحة بعد إضافة الكوكيز
-    driver.get("https://www.facebook.com/")
-    time.sleep(3)
+    # الانتقال إلى صفحة الحساب الشخصية
+    driver.get(PAGE_URL)
+    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, "body")))
 
-    # ✅ الانتقال إلى صفحة الفيسبوك مباشرة
-    driver.get(PAGE_URL)  # فتح رابط الصفحة مباشرة
+    # انتظار التحميل الكامل للصفحة
     time.sleep(5)
 
+    # التبديل إلى الصفحة (إن كانت هذه هي صفحة المستخدم)
     try:
-        # ✅ البحث عن زر "تبديل الآن" باستخدام JavaScript والضغط عليه
-        switch_button = driver.execute_script("""
-            let buttons = document.querySelectorAll('div[role="button"]');
-            for (let btn of buttons) {
-                if (btn.innerText.includes("تبديل الآن")) {
-                    btn.click();
-                    return true;
-                }
-            }
-            return false;
-        """)
-
-        if switch_button:
-            print("✅ تم التبديل إلى الصفحة بنجاح!")
-        else:
-            print("❌ لم يتم العثور على زر تبديل الصفحة، ربما تغيرت الواجهة!")
-
+        switch_button = driver.find_element(By.XPATH, '//div[contains(text(),"تبديل الآن")]')
+        switch_button.click()
+        time.sleep(5)
+        print("تم التبديل إلى الصفحة بنجاح.")
     except Exception as e:
-        print(f"❌ خطأ أثناء التبديل إلى الصفحة: {e}")
-        driver.quit()
-        exit()
+        print(f"❌ خطأ أثناء التبديل للصفحة: {e}")
 
-    # ✅ الانتقال إلى المجموعة للنشر باسم الصفحة
+    # الانتقال إلى المجموعة والنشر
     driver.get(GROUP_URL)
-    time.sleep(3)
+    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[role="textbox"]')))
+    post_box = driver.find_element(By.CSS_SELECTOR, '[role="textbox"]')
+    post_box.send_keys(POST_CONTENT)
 
-    try:
-        # ✅ انتظار مربع الكتابة باسم الصفحة
-        WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[role="textbox"]')))
-        post_box = driver.find_element(By.CSS_SELECTOR, '[role="textbox"]')
-        post_box.send_keys(POST_CONTENT)
+    # الضغط على زر النشر
+    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'div[aria-label="نشر"]'))).click()
 
-        # ✅ انتظار زر النشر والضغط عليه
-        WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'div[aria-label="نشر"]'))).click()
-
-        time.sleep(5)  # انتظار تأكيد النشر
-        print("✅ تم نشر المنشور باسم الصفحة بنجاح!")
-
-    except Exception as e:
-        print(f"❌ خطأ أثناء النشر: {e}")
+    time.sleep(5)  # الانتظار قليلاً للتأكد من نشر المنشور
+    print("تم نشر المنشور بنجاح!")
 
 except Exception as e:
     print(f"❌ خطأ أثناء التشغيل: {e}")
 
 finally:
-    driver.quit()
+    if 'driver' in locals():
+        driver.quit()
