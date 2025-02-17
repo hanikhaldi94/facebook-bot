@@ -18,12 +18,13 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     xdg-utils \
     libgbm1 \
-    libvulkan1
+    libvulkan1 \
+    libx11-xcb1
 
 # تحميل وتثبيت Google Chrome
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
     dpkg -i google-chrome-stable_current_amd64.deb && \
-    apt-get -f install
+    apt-get -f install -y
 
 # تثبيت Node.js و npm
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
