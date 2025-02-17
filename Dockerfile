@@ -7,11 +7,18 @@ RUN apt-get update && apt-get install -y \
     unzip \
     ca-certificates \
     gnupg \
-    libgconf-2-4
+    libgconf-2-4 \
+    libnss3 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libgtk-3-0 \
+    libgbm1
 
 # تثبيت Google Chrome
 RUN curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o google-chrome.deb
-RUN dpkg -i google-chrome.deb || apt-get -fy install
+RUN dpkg -i google-chrome.deb; apt-get -fy install
 
 # تثبيت chromedriver-autoinstaller
 RUN pip install chromedriver-autoinstaller
