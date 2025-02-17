@@ -1,3 +1,5 @@
+import uuid
+import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -5,8 +7,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
-import os
-import uuid
 
 # استبدال البيانات في الكوكيز
 FB_COOKIES = [
@@ -32,8 +32,13 @@ options.add_argument("--headless")  # لتشغيل المتصفح بدون وا�
 # تحديد مجلد بيانات المستخدم الفريد لكل جلسة
 unique_id = str(uuid.uuid4())  # إنشاء معرف فريد
 user_data_dir = f"/tmp/chrome_user_data_{unique_id}"  # مسار مجلد بيانات المستخدم الفريد
-if not os.path.exists(user_data_dir):
-    os.makedirs(user_data_dir)
+
+# حذف المجلد إذا كان موجودًا من الجلسات السابقة
+if os.path.exists(user_data_dir):
+    os.rmdir(user_data_dir)  # احذف المجلد إذا كان موجودًا
+
+os.makedirs(user_data_dir)  # إنشاء المجلد الفريد
+
 options.add_argument(f"--user-data-dir={user_data_dir}")
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
