@@ -35,7 +35,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
     apt-get install -y nodejs
 
 # تثبيت Puppeteer
-RUN npm install puppeteer
+RUN rm -rf node_modules package-lock.json && \
+    npm install puppeteer
 
 # إعدادات العمل
 WORKDIR /app
