@@ -1,36 +1,33 @@
 name: Deploy Facebook Bot
 
+# تحديد الأحداث التي تشغل هذا الإجراء
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - main  # سيعمل فقط عند الدفع إلى الفرع الرئيسي
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    
+    runs-on: ubuntu-latest  # البيئة التي سيتم بناء المشروع عليها
+
     steps:
+      # 1. استيراد المستودع من GitHub
       - name: Checkout repository
-        uses: actions/checkout@v2
-      
+        uses: actions/checkout@v3
+
+      # 2. إعداد بيئة Python
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          python-version: '3.13'  # تحديد إصدار Python المطلوب
 
+      # 3. تثبيت الحزم المطلوبة باستخدام pip
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt  # تثبيت الحزم من ملف requirements.txt
+          pip install chromedriver-autoinstaller  # تثبيت مكتبة chromedriver-autoinstaller إذا كنت بحاجة إليها
 
-      - name: Install Chrome
-        run: sudo apt-get install -y google-chrome-stable
-
-      - name: Install ChromeDriver
+      # 4. تشغيل السكربت
+      - name: Run bot
         run: |
-          pip install chromedriver-autoinstaller
-          python -m chromedriver_autoinstaller
-
-      - name: Run Bot
-        run: python bot.py
+          python bot.py  # تشغيل السكربت bot.py
