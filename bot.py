@@ -1,99 +1,61 @@
-import os
-import json
-import time
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+import json
 
-# تعيين قيم المتغيرات مباشرة (مؤقتًا للـ testing)
-FB_COOKIES = '[{"name": "c_user", "value": "100005694367110", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": false}, {"name": "xs", "value": "16%3AU-Tj7sI8IGDY3g%3A2%3A1733396952%3A-1%3A1051%3AxrrDo0mjoqB6vw%3AAcXLYyYbztJKBbHYGnCjD7gDFRhLghVevDoKrwMS2wUK", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": false}]'
-GROUP_URL = 'https://www.facebook.com/groups/2698034130415038/'
-PAGE_URL = 'https://www.facebook.com/profile.php?id=61564136097717'
-POST_CONTENT = "🚀 هذا منشور تجريبي!"
+# استبدل هنا بالكود الخاص بك
+FB_COOKIES = [
+    {"name": "c_user", "value": "100005694367110", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
+    {"name": "xs", "value": "16%3AU-Tj7sI8IGDY3g%3A2%3A1733396952%3A-1%3A1051%3AxrrDo0mjoqB6vw%3AAcXLYyYbztJKBbHYGnCjD7gDFRhLghVevDoKrwMS2wUK", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False}
+]
+GROUP_URL = "https://www.facebook.com/groups/2698034130415038/"
+PAGE_URL = "https://www.facebook.com/profile.php?id=61564136097717"
+POST_CONTENT = "هذا هو المحتوى الذي سيتم نشره في المجموعة."
 
-# طباعة القيم للتحقق
-print("FB_COOKIES:", FB_COOKIES)
-print("GROUP_URL:", GROUP_URL)
-print("PAGE_URL:", PAGE_URL)
+# إعداد الـ WebDriver
+options = webdriver.ChromeOptions()
+options.add_argument("--headless")  # لتشغيل المتصفح بدون واجهة رسومية
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
-# تحقق من المتغيرات
-if not all([FB_COOKIES, GROUP_URL, PAGE_URL]):
-    raise ValueError("يرجى ضبط جميع متغيرات البيئة المطلوبة.")
+# تحميل الكوكيز
+driver.get("https://www.facebook.com/")
+for cookie in FB_COOKIES:
+    driver.add_cookie(cookie)
 
-# إعداد متصفح Chrome بدون واجهة رسومية (Headless Mode)
-chrome_options = Options()
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
+# الانتقال إلى صفحة المجموعة
+driver.get(GROUP_URL)
 
-# تحميل وتحديد المسار لـ ChromeDriver باستخدام webdriver-manager
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+# الانتظار حتى تظهر نافذة الكتابة
+WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located((By.CSS_SELECTOR, '[role="textbox"]'))
+)
 
-try:
-    # فتح فيسبوك
-    driver.get("https://www.facebook.com")
-    time.sleep(3)
+# العثور على مربع النص والكتابة فيه
+post_box = driver.find_element(By.CSS_SELECTOR, '[role="textbox"]')
+post_box.send_keys(POST_CONTENT)
 
-    # تحميل الكوكيز باستخدام JavaScript
-    cookie_script = """
-    let cookies = JSON.parse(arguments[0]);
-    cookies.forEach(cookie => {
-        document.cookie = `${cookie.name}=${cookie.value}; domain=${cookie.domain}; path=${cookie.path}; ${cookie.secure ? "Secure;" : ""} ${cookie.httpOnly ? "HttpOnly;" : ""}`;
-    });
-    """
-    driver.execute_script(cookie_script, FB_COOKIES)
-    print("تم تحميل الكوكيز بنجاح!")
+# الضغط على زر النشر
+WebDriverWait(driver, 10).until(
+    EC.element_to_be_clickable((By.CSS_SELECTOR, 'div[aria-label="نشر"]'))
+).click()
 
-    # إعادة تحميل الصفحة بعد إدخال الكوكيز
-    driver.refresh()
-    time.sleep(5)
+# الانتظار قليلاً للتحقق من النشر
+time.sleep(3)
 
-    # الذهاب إلى المجموعة
-    driver.get(GROUP_URL)
-    print("فتح المجموعة:", GROUP_URL)
-    time.sleep(5)
+# استخراج الـ ID المنشور من الرابط
+# قد تحتاج إلى استخدام طريقة أخرى مثل التحقق من الـ DOM بعد النشر
+post_url = driver.current_url
 
-    # إدخال النص في المنشور بطريقة طبيعية
-    post_script = """
-    let postBox = document.querySelector('[role="textbox"]');
-    if (postBox) {
-        postBox.focus();
-        let inputEvent = new InputEvent('input', { bubbles: true });
-        postBox.innerText = arguments[0];
-        postBox.dispatchEvent(inputEvent);
-    }
-    """
-    driver.execute_script(post_script, POST_CONTENT)
-    time.sleep(3)  # إضافة تأخير أكبر هنا
+# طباعة نتائج النشر
+if post_url:
+    print(f"تم نشر المنشور بنجاح! رابط المنشور: {post_url}")
+else:
+    print("لم يتم نشر المنشور.")
 
-    # الضغط على زر النشر
-    post_button_script = """
-    let buttons = document.querySelectorAll('div[aria-label="نشر"]');
-    if (buttons.length > 0) {
-        buttons[0].click();
-    }
-    """
-    driver.execute_script(post_button_script)
-    time.sleep(5)  # إضافة تأخير أطول للتأكد من نشر المنشور
-
-    print("تم نشر المنشور بنجاح!")
-
-    # الحصول على ID المنشور باستخدام طريقة أخرى
-    post_id_script = """
-    let postLink = document.querySelector('a[href*="posts/"]');
-    if (postLink) {
-        let postId = postLink.href.split('/').pop();
-        return postId;
-    }
-    return null;
-    """
-    post_id = driver.execute_script(post_id_script)
-    print(f"ID المنشور: {post_id}")
-
-except Exception as e:
-    print("حدث خطأ:", str(e))
-
-finally:
-    driver.quit()  # إغلاق المتصفح
+# إغلاق المتصفح
+driver.quit()
