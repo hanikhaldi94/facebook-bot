@@ -1,46 +1,27 @@
-# استخدم صورة Ubuntu كأساس
-FROM ubuntu:20.04
+# استخدام صورة Python الرسمية
+FROM python:3.9-slim
 
-# تثبيت المتطلبات الأساسية
+# تثبيت التبعيات المطلوبة
 RUN apt-get update && apt-get install -y \
-    wget \
-    unzip \
     curl \
-    gnupg \
+    unzip \
     ca-certificates \
-    python3 \
-    python3-pip \
-    python3-dev \
-    libglib2.0-0 \
-    libnss3 \
-    libx11-6 \
-    libx11-dev \
-    libxtst6 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libgtk-3-0 \
-    libasound2 \
-    libxcomposite1 \
-    libxrandr2 \
-    libappindicator3-1 \
-    libgbm1 \
-    libnss3-dev \
-    && curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" | tee /etc/apt/sources.list.d/google-chrome.list \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable \
-    && wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip \
-    && unzip /tmp/chromedriver.zip -d /usr/local/bin/ \
-    && chmod +x /usr/local/bin/chromedriver \
-    && rm -rf /var/lib/apt/lists/* /tmp/chromedriver.zip
+    gnupg
 
-# تثبيت المتطلبات الخاصة بمشروع البايثون
+# تثبيت Google Chrome
+RUN curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o google-chrome.deb
+RUN dpkg -i google-chrome.deb; apt-get -fy install
+
+# تثبيت chromedriver-autoinstaller
+RUN pip install chromedriver-autoinstaller
+
+# تثبيت التبعيات الخاصة بـ Python
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# نسخ ملفات التطبيق
+COPY . /app
 WORKDIR /app
-COPY requirements.txt /app/
-RUN pip3 install -r requirements.txt
 
-# نسخ كود التطبيق إلى الحاوية
-COPY . /app/
-
-# تشغيل التطبيق
-CMD ["python3", "bot.py"]
+# تنفيذ البوت
+CMD ["python", "bot.py"]
