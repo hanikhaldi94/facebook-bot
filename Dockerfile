@@ -1,6 +1,9 @@
 # استخدام صورة صغيرة من Ubuntu لتقليل الحجم
 FROM ubuntu:20.04
 
+# إعداد البيئة لتجنب الإدخال التفاعلي
+ENV DEBIAN_FRONTEND=noninteractive
+
 # تحديث الحزم الأساسية وتثبيت الأدوات المطلوبة
 RUN apt-get update && apt-get install -y \
     wget \
