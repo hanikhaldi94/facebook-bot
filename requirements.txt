@@ -1,2 +1,2 @@
-selenium==4.9.1
-webdriver-manager==4.0.2
+# إذا كنت تستخدم Python مع Puppeteer عبر مكتبة pyppeteer (اختياري)
+pyppeteer==1.0.2
