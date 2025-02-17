@@ -7,6 +7,6 @@
     "start": "node bot.js"
   },
   "dependencies": {
-    "puppeteer-core": "^20.0.0"  // تأكد من تثبيت النسخة الصحيحة لـ puppeteer-core
+    "puppeteer-core": "^20.0.0" 
   }
 }
