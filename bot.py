@@ -1,6 +1,6 @@
 import os
 import shutil
-import uuid
+import tempfile
 import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -32,15 +32,10 @@ options.add_argument("--no-sandbox")  # لتجنب مشاكل في بيئات ا
 options.add_argument("--disable-dev-shm-usage")  # لتجنب مشاكل الذاكرة المشتركة
 options.add_argument("--remote-debugging-port=9222")  # إضافة منفذ تصحيح عن بعد
 
-# تحديد مجلد بيانات المستخدم الفريد باستخدام uuid لضمان أنه لا يتكرر
-user_data_dir = f"/tmp/chrome_user_data_{str(uuid.uuid4())}"  # استخدام UUID فريد
+# تخصيص مجلد مؤقت للبيانات
+user_data_dir = tempfile.mkdtemp()
 
-# حذف المجلد إذا كان موجودًا من الجلسات السابقة
-if os.path.exists(user_data_dir):
-    shutil.rmtree(user_data_dir)  # احذف المجلد وجميع محتوياته
-
-os.makedirs(user_data_dir)  # إنشاء المجلد الفريد
-
+# إضافة المجلد المؤقت إلى إعدادات المتصفح
 options.add_argument(f"--user-data-dir={user_data_dir}")
 
 # إعداد الـ WebDriver مع الخيارات
