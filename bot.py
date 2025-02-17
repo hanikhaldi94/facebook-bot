@@ -1,5 +1,6 @@
 import time
 import tempfile
+import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -29,8 +30,9 @@ options.add_argument("--disable-crash-reporter")
 options.add_argument("--disable-backgrounding-occluded-windows")
 options.add_argument("--headless=new")  # تشغيل المتصفح بدون واجهة
 
-# تحديد مجلد مخصص لبيانات المستخدم
-options.add_argument("--user-data-dir=/tmp/chrome-user-data")  # يمكنك تخصيص المسار كما تريد
+# إنشاء مجلد مؤقت فريد لكل جلسة
+user_data_dir = tempfile.mkdtemp()
+options.add_argument(f"--user-data-dir={user_data_dir}")
 
 # تشغيل المتصفح
 try:
@@ -94,3 +96,6 @@ except Exception as e:
 finally:
     if 'driver' in locals():
         driver.quit()
+    # تنظيف مجلد البيانات المؤقت بعد الانتهاء
+    if os.path.exists(user_data_dir):
+        os.rmdir(user_data_dir)
