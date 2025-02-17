@@ -1,3 +1,9 @@
+import chromedriver_autoinstaller
+
+# تأكد من تثبيت ChromeDriver المناسب للإصدار الحالي من Google Chrome
+chromedriver_autoinstaller.install()
+
+
 import os
 import json
 import time
