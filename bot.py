@@ -11,6 +11,11 @@ GROUP_URL = os.getenv("GROUP_URL")
 PAGE_URL = os.getenv("PAGE_URL")
 POST_CONTENT = os.getenv("POST_CONTENT", "🚀 هذا منشور تجريبي!")
 
+# ✅ طباعة القيم للتحقق
+print("FB_COOKIES:", FB_COOKIES)
+print("GROUP_URL:", GROUP_URL)
+print("PAGE_URL:", PAGE_URL)
+
 # ✅ التحقق من المتغيرات
 if not all([FB_COOKIES, GROUP_URL, PAGE_URL]):
     raise ValueError("❌ يرجى ضبط جميع متغيرات البيئة المطلوبة.")
