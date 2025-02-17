@@ -1,15 +1,14 @@
 import os
-import json
 import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 
 # ✅ جلب متغيرات البيئة
-FB_COOKIES = os.getenv("FB_COOKIES")
-GROUP_URL = os.getenv("GROUP_URL")
-PAGE_URL = os.getenv("PAGE_URL")
-POST_CONTENT = os.getenv("POST_CONTENT", "🚀 هذا منشور تجريبي!")
+FB_COOKIES = '[{"name": "c_user", "value": "1234567890", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": false}, {"name": "xs", "value": "ABCD1234", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": false}]'
+GROUP_URL = "https://www.facebook.com/groups/2698034130415038/"
+PAGE_URL = "https://www.facebook.com/profile.php?id=61564136097717"
+POST_CONTENT = "🚀 هذا منشور تجريبي!"
 
 # ✅ طباعة القيم للتحقق
 print("FB_COOKIES:", FB_COOKIES)
