@@ -30,6 +30,7 @@ POST_CONTENT = "هذا هو المحتوى الذي سيتم نشره في ال�
 options = webdriver.ChromeOptions()
 options.add_argument("--headless")  # لتشغيل المتصفح بدون واجهة رسومية
 options.add_argument("--no-sandbox")  # لتجنب مشاكل في بيئات الحاويات مثل Docker
+options.add_argument("--disable-dev-shm-usage")  # لتحسين الأداء في بيئات مثل Railway
 
 # تحديد مجلد بيانات المستخدم الفريد باستخدام uuid لضمان أنه لا يتكرر
 user_data_dir = f"/tmp/chrome_user_data_{uuid.uuid4().hex}"
