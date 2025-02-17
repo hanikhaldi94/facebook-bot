@@ -1,27 +1,35 @@
-import chromedriver_autoinstaller
 import os
 import json
 import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 
-# إعداد متغيرات البيئة (من المفترض أن تكون قد ضبطتها في الكود مباشرة)
+# تعيين قيم المتغيرات مباشرة (مؤقتًا للـ testing)
 FB_COOKIES = '[{"name": "c_user", "value": "100005694367110", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": false}, {"name": "xs", "value": "16%3AU-Tj7sI8IGDY3g%3A2%3A1733396952%3A-1%3A1051%3AxrrDo0mjoqB6vw%3AAcXLYyYbztJKBbHYGnCjD7gDFRhLghVevDoKrwMS2wUK", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": false}]'
 GROUP_URL = 'https://www.facebook.com/groups/2698034130415038/'
 PAGE_URL = 'https://www.facebook.com/profile.php?id=61564136097717'
 POST_CONTENT = "🚀 هذا منشور تجريبي!"
 
-# إعداد المتصفح بدون واجهة رسومية (Headless Mode)
+# طباعة القيم للتحقق
+print("FB_COOKIES:", FB_COOKIES)
+print("GROUP_URL:", GROUP_URL)
+print("PAGE_URL:", PAGE_URL)
+
+# تحقق من المتغيرات
+if not all([FB_COOKIES, GROUP_URL, PAGE_URL]):
+    raise ValueError("يرجى ضبط جميع متغيرات البيئة المطلوبة.")
+
+# إعداد متصفح Chrome بدون واجهة رسومية (Headless Mode)
 chrome_options = Options()
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 
-# تشغيل المتصفح
-service = Service("/usr/local/bin/chromedriver")  # تأكد من المسار الصحيح لـ ChromeDriver
-driver = webdriver.Chrome(service=service, options=chrome_options)
+# تحميل وتحديد المسار لـ ChromeDriver باستخدام webdriver-manager
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
 try:
     # فتح فيسبوك
@@ -68,30 +76,19 @@ try:
     }
     """
     driver.execute_script(post_button_script)
+
     print("تم نشر المنشور بنجاح!")
 
-    # التحقق من المنشورات في المجموعة بعد النشر
-    time.sleep(5)  # الانتظار بعد النشر
-
-    check_post_script = """
-    let posts = document.querySelectorAll('[role="article"]');
-    let postIds = [];
-    posts.forEach(post => {
-        let postLink = post.querySelector('a');
-        if (postLink) {
-            let postUrl = postLink.href;
-            let postId = postUrl.split('/').pop();
-            postIds.push(postId);
-        }
-    });
-    return postIds;
+    # الحصول على ID المنشور
+    post_id_script = """
+    let post = document.querySelector('[role="feed"]');
+    if (post) {
+        let postId = post.querySelector('a[href*="posts/"]')?.href.split('/').pop();
+        return postId;
+    }
     """
-
-    post_ids = driver.execute_script(check_post_script)
-    if post_ids:
-        print("تم نشر المنشور. معرف المنشور هو:", post_ids[0])  # عرض معرف المنشور الأول
-    else:
-        print("لم يتم العثور على المنشور.")
+    post_id = driver.execute_script(post_id_script)
+    print(f"ID المنشور: {post_id}")
 
 except Exception as e:
     print("حدث خطأ:", str(e))
