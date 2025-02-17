@@ -1,35 +1,40 @@
-# استخدام صورة Python الرسمية
-FROM python:3.9-slim
+# استخدم صورة Node.js
+FROM node:16-slim
 
-# تثبيت التبعيات المطلوبة
+# تثبيت التبعيات اللازمة لتشغيل Puppeteer
 RUN apt-get update && apt-get install -y \
+    wget \
     curl \
-    unzip \
     ca-certificates \
-    gnupg \
-    libgconf-2-4 \
-    libnss3 \
     libx11-xcb1 \
     libxcomposite1 \
     libxdamage1 \
     libxrandr2 \
     libgtk-3-0 \
-    libgbm1
+    libgbm1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libnspr4 \
+    libnss3 \
+    libxss1 \
+    libxtst6 \
+    fonts-liberation \
+    libappindicator3-1 \
+    libu2f-udev \
+    xdg-utils \
+    --no-install-recommends
 
-# تثبيت Google Chrome
-RUN curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o google-chrome.deb
-RUN dpkg -i google-chrome.deb; apt-get -fy install
-
-# تثبيت chromedriver-autoinstaller
-RUN pip install chromedriver-autoinstaller
-
-# تثبيت التبعيات الخاصة بـ Python
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+# تثبيت Puppeteer
+RUN npm install puppeteer
 
 # نسخ ملفات التطبيق
 COPY . /app
 WORKDIR /app
 
-# تنفيذ البوت
-CMD ["python", "bot.py"]
+# تثبيت التبعيات
+RUN npm install
+
+# تشغيل البوت
+CMD ["node", "bot.js"]
