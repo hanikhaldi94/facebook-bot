@@ -1,3 +1,2 @@
 selenium==4.9.1
-chromedriver-autoinstaller==0.6.4
-webdriver-manager==3.8.1
+chromedriver-manager==0.0.9
