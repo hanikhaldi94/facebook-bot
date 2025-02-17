@@ -3,45 +3,44 @@ import chromedriver_autoinstaller
 # تأكد من تثبيت ChromeDriver المناسب للإصدار الحالي من Google Chrome
 chromedriver_autoinstaller.install()
 
-import os
 import json
 import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 
-# ✅ جلب متغيرات البيئة
-FB_COOKIES = os.getenv("FB_COOKIES")  # الكوكيز كـ JSON
-GROUP_URL = os.getenv("GROUP_URL")
-PAGE_URL = os.getenv("PAGE_URL")
-POST_CONTENT = os.getenv("POST_CONTENT", "🚀 هذا منشور تجريبي!")
+#  وضع قيم المتغيرات مباشرة هنا للاختبار
+FB_COOKIES = '[{"name": "c_user", "value": "100005694367110", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": false}, {"name": "xs", "value": "16%3AU-Tj7sI8IGDY3g%3A2%3A1733396952%3A-1%3A1051%3AxrrDo0mjoqB6vw%3AAcXLYyYbztJKBbHYGnCjD7gDFRhLghVevDoKrwMS2wUK", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": false}]'
+GROUP_URL = "https://www.facebook.com/groups/2698034130415038/"
+PAGE_URL = "https://www.facebook.com/profile.php?id=61564136097717"
+POST_CONTENT = "🚀 هذا منشور تجريبي!"
 
-# ✅ طباعة القيم للتحقق
+#  طباعة القيم للتحقق
 print("FB_COOKIES:", FB_COOKIES)
 print("GROUP_URL:", GROUP_URL)
 print("PAGE_URL:", PAGE_URL)
 
-# ✅ التحقق من المتغيرات
+#  التحقق من المتغيرات
 if not all([FB_COOKIES, GROUP_URL, PAGE_URL]):
-    raise ValueError("❌ يرجى ضبط جميع متغيرات البيئة المطلوبة.")
+    raise ValueError(" يرجى ضبط جميع متغيرات البيئة المطلوبة.")
 
-# ✅ إعداد متصفح Chrome بدون واجهة رسومية (Headless Mode)
+#  إعداد متصفح Chrome بدون واجهة رسومية (Headless Mode)
 chrome_options = Options()
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 
-# ✅ تشغيل المتصفح
+#  تشغيل المتصفح
 service = Service(chromedriver_autoinstaller.install())  # سيتم تثبيت chromedriver تلقائيًا
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
 try:
-    # ✅ فتح فيسبوك
+    #  فتح فيسبوك
     driver.get("https://www.facebook.com")
     time.sleep(3)
 
-    # ✅ تحميل الكوكيز باستخدام JavaScript
+    #  تحميل الكوكيز باستخدام JavaScript
     cookie_script = """
     let cookies = JSON.parse(arguments[0]);
     cookies.forEach(cookie => {
@@ -50,18 +49,18 @@ try:
     """
     driver.execute_script(cookie_script, FB_COOKIES)
     
-    print("✅ تم تحميل الكوكيز بنجاح!")
+    print(" تم تحميل الكوكيز بنجاح!")
 
-    # ✅ إعادة تحميل الصفحة بعد إدخال الكوكيز
+    #  إعادة تحميل الصفحة بعد إدخال الكوكيز
     driver.refresh()
     time.sleep(5)
 
-    # ✅ الذهاب إلى المجموعة
+    #  الذهاب إلى المجموعة
     driver.get(GROUP_URL)
-    print("🔹 فتح المجموعة:", GROUP_URL)
+    print(" فتح المجموعة:", GROUP_URL)
     time.sleep(5)
 
-    # ✅ إدخال النص في المنشور بطريقة طبيعية
+    #  إدخال النص في المنشور بطريقة طبيعية
     post_script = """
     let postBox = document.querySelector('[role="textbox"]');
     if (postBox) {
@@ -74,7 +73,7 @@ try:
     driver.execute_script(post_script, POST_CONTENT)
     time.sleep(2)
 
-    # ✅ الضغط على زر النشر
+    #  الضغط على زر النشر
     post_button_script = """
     let buttons = document.querySelectorAll('div[aria-label="نشر"]');
     if (buttons.length > 0) {
@@ -83,10 +82,10 @@ try:
     """
     driver.execute_script(post_button_script)
     
-    print("✅ تم نشر المنشور بنجاح!")
+    print(" تم نشر المنشور بنجاح!")
 
 except Exception as e:
-    print("❌ حدث خطأ:", str(e))
+    print(" حدث خطأ:", str(e))
 
 finally:
-    driver.quit()  # ✅ إغلاق المتصفح
+    driver.quit()  #  إغلاق المتصفح
