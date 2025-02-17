@@ -15,17 +15,17 @@ FB_COOKIES = [
     {"name": "datr", "value": "_X1rZXLEnaiQ1InGXamm_2lM", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
 ]
 
-# ✅ معلومات الصفحة والمجموعة
-PAGE_NAME = "اسم صفحتك هنا"  # ضع هنا اسم الصفحة بالضبط كما يظهر في الفيسبوك
+# ✅ رابط الصفحة مباشرة
+PAGE_URL = "https://www.facebook.com/YOUR_PAGE_URL_HERE"  # ضع رابط الصفحة هنا
 GROUP_URL = "https://www.facebook.com/groups/2698034130415038/"
 POST_CONTENT = "🚀 هذا منشور تجريبي للنشر باسم الصفحة!"
 
 # ✅ إعداد WebDriver
 options = webdriver.ChromeOptions()
-options.add_argument("--disable-gpu")  
-options.add_argument("--disable-dev-shm-usage")  
-options.add_argument("--disable-software-rasterizer")  
-options.add_argument("--no-sandbox")  
+options.add_argument("--disable-gpu")
+options.add_argument("--disable-dev-shm-usage")
+options.add_argument("--disable-software-rasterizer")
+options.add_argument("--no-sandbox")
 options.add_argument("--headless")  # تشغيل بدون واجهة (يمكن تعطيله للاختبار)
 
 # ✅ تشغيل المتصفح
@@ -43,22 +43,30 @@ try:
     driver.get("https://www.facebook.com/")
     time.sleep(3)
 
-    # ✅ التبديل إلى الصفحة المطلوبة
-    driver.get("https://www.facebook.com/pages/?category=your_pages")  # الانتقال إلى قائمة الصفحات
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+    # ✅ الانتقال إلى صفحة الفيسبوك مباشرة
+    driver.get(PAGE_URL)  # فتح رابط الصفحة مباشرة
+    time.sleep(5)
 
     try:
-        # البحث عن الصفحة المطلوبة والنقر عليها
-        page_link = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, f"//span[contains(text(), '{PAGE_NAME}')]"))
-        )
-        page_link.click()
-        time.sleep(3)  # انتظار تحميل الصفحة
+        # ✅ البحث عن زر "تبديل الآن" باستخدام JavaScript والضغط عليه
+        switch_button = driver.execute_script("""
+            let buttons = document.querySelectorAll('div[role="button"]');
+            for (let btn of buttons) {
+                if (btn.innerText.includes("تبديل الآن")) {
+                    btn.click();
+                    return true;
+                }
+            }
+            return false;
+        """)
 
-        print(f"✅ تم التبديل إلى الصفحة: {PAGE_NAME}")
+        if switch_button:
+            print("✅ تم التبديل إلى الصفحة بنجاح!")
+        else:
+            print("❌ لم يتم العثور على زر تبديل الصفحة، ربما تغيرت الواجهة!")
 
     except Exception as e:
-        print(f"❌ لم يتم العثور على الصفحة: {PAGE_NAME} - تأكد من كتابة الاسم بشكل صحيح.")
+        print(f"❌ خطأ أثناء التبديل إلى الصفحة: {e}")
         driver.quit()
         exit()
 
