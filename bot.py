@@ -28,14 +28,12 @@ POST_CONTENT = "هذا هو المحتوى الذي سيتم نشره في ال�
 
 # إعداد الـ WebDriver
 options = webdriver.ChromeOptions()
-# إزالة `--headless` للتشغيل مع واجهة رسومية (اختياري)
-# options.add_argument("--headless")
 options.add_argument("--no-sandbox")  # لتجنب مشاكل في بيئات الحاويات مثل Docker
 options.add_argument("--disable-dev-shm-usage")  # لتجنب مشاكل الذاكرة المشتركة
 options.add_argument("--remote-debugging-port=9222")  # إضافة منفذ تصحيح عن بعد
 
 # تحديد مجلد بيانات المستخدم الفريد باستخدام uuid لضمان أنه لا يتكرر
-user_data_dir = "/tmp/chrome_user_data"  # استخدام مسار مؤقت داخل الـ container
+user_data_dir = f"/tmp/chrome_user_data_{str(uuid.uuid4())}"  # استخدام UUID فريد
 
 # حذف المجلد إذا كان موجودًا من الجلسات السابقة
 if os.path.exists(user_data_dir):
