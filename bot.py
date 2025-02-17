@@ -1,5 +1,6 @@
 import uuid
 import os
+import shutil
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -35,7 +36,7 @@ user_data_dir = f"/tmp/chrome_user_data_{unique_id}"  # مسار مجلد بيا
 
 # حذف المجلد إذا كان موجودًا من الجلسات السابقة
 if os.path.exists(user_data_dir):
-    os.rmdir(user_data_dir)  # احذف المجلد إذا كان موجودًا
+    shutil.rmtree(user_data_dir)  # احذف المجلد وجميع محتوياته
 
 os.makedirs(user_data_dir)  # إنشاء المجلد الفريد
 
