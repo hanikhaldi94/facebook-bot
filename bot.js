@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 
-// الكوكيز الخاصة بك
+//  الكوكيز الخاصة بك
 const FB_COOKIES = [
     { name: 'c_user', value: '100005694367110', domain: '.facebook.com', path: '/', secure: true, httpOnly: false },
     { name: 'xs', value: 'your-xs-cookie', domain: '.facebook.com', path: '/', secure: true, httpOnly: false },
