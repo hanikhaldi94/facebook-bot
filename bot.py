@@ -6,6 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import os
+import uuid
 
 # استبدال البيانات في الكوكيز
 FB_COOKIES = [
@@ -29,7 +30,8 @@ options = webdriver.ChromeOptions()
 options.add_argument("--headless")  # لتشغيل المتصفح بدون واجهة رسومية
 
 # تحديد مجلد بيانات المستخدم الفريد لكل جلسة
-user_data_dir = "/tmp/chrome_user_data"  # مسار مجلد بيانات المستخدم
+unique_id = str(uuid.uuid4())  # إنشاء معرف فريد
+user_data_dir = f"/tmp/chrome_user_data_{unique_id}"  # مسار مجلد بيانات المستخدم الفريد
 if not os.path.exists(user_data_dir):
     os.makedirs(user_data_dir)
 options.add_argument(f"--user-data-dir={user_data_dir}")
