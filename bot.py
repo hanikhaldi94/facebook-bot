@@ -1,13 +1,13 @@
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
-import json
+import os
 
-# استبدل هنا بالكود الخاص بك
+# استبدال البيانات في الكوكيز
 FB_COOKIES = [
     {"name": "c_user", "value": "100005694367110", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
     {"name": "datr", "value": "xerKZkgrzmFkzN468jcjg76L", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
@@ -27,6 +27,13 @@ POST_CONTENT = "هذا هو المحتوى الذي سيتم نشره في ال�
 # إعداد الـ WebDriver
 options = webdriver.ChromeOptions()
 options.add_argument("--headless")  # لتشغيل المتصفح بدون واجهة رسومية
+
+# تحديد مجلد بيانات المستخدم الفريد لكل جلسة
+user_data_dir = "/tmp/chrome_user_data"  # مسار مجلد بيانات المستخدم
+if not os.path.exists(user_data_dir):
+    os.makedirs(user_data_dir)
+options.add_argument(f"--user-data-dir={user_data_dir}")
+
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 # تحميل الكوكيز
