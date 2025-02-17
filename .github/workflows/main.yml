@@ -1,33 +1,33 @@
 name: Deploy Facebook Bot
 
-# تحديد الأحداث التي تشغل هذا الإجراء
 on:
   push:
     branches:
-      - main  # سيعمل فقط عند الدفع إلى الفرع الرئيسي
+      - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest  # البيئة التي سيتم بناء المشروع عليها
+  deploy:
+    runs-on: ubuntu-latest
 
     steps:
-      # 1. استيراد المستودع من GitHub
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # 2. إعداد بيئة Python
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.13'  # تحديد إصدار Python المطلوب
+          python-version: '3.9'
 
-      # 3. تثبيت الحزم المطلوبة باستخدام pip
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt  # تثبيت الحزم من ملف requirements.txt
-          pip install chromedriver-autoinstaller  # تثبيت مكتبة chromedriver-autoinstaller إذا كنت بحاجة إليها
+          pip install -r requirements.txt
 
-      # 4. تشغيل السكربت
-      - name: Run bot
+      - name: Set environment variables
         run: |
-          python bot.py  # تشغيل السكربت bot.py
+          echo "FB_COOKIES=${{ secrets.FB_COOKIES }}" >> $GITHUB_ENV
+          echo "PAGE_URL=${{ secrets.PAGE_URL }}" >> $GITHUB_ENV
+          echo "GROUP_URL=${{ secrets.GROUP_URL }}" >> $GITHUB_ENV
+          echo "POST_CONTENT=${{ secrets.POST_CONTENT }}" >> $GITHUB_ENV
+
+      - name: Run bot.py
+        run: python bot.py
