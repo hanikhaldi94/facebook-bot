@@ -32,7 +32,7 @@ options.add_argument("--headless")  # لتشغيل المتصفح بدون وا�
 options.add_argument("--no-sandbox")  # لتجنب مشاكل في بيئات الحاويات مثل Docker
 
 # تحديد مجلد بيانات المستخدم الفريد باستخدام uuid لضمان أنه لا يتكرر
-user_data_dir = f"/app/chrome_user_data_{uuid.uuid4().hex}"
+user_data_dir = f"/tmp/chrome_user_data_{uuid.uuid4().hex}"
 
 # حذف المجلد إذا كان موجودًا من الجلسات السابقة
 if os.path.exists(user_data_dir):
