@@ -1,2 +1,3 @@
 selenium==4.9.1
 chromedriver-manager==0.0.9
+webdriver-manager==4.8.0
