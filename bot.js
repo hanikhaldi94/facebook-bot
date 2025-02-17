@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer-core');
 const { executablePath } = require('puppeteer-core');
 
+// الكوكيز المطلوبة
 const FB_COOKIES = [
     {"name": "c_user", "value": "100005694367110", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": false},
     {"name": "xs", "value": "16%3AU-Tj7sI8IGDY3g%3A2%3A1733396952%3A-1%3A1051%3AxrrDo0mjoqB6vw%3AAcXLYyYbztJKBbHYGnCjD7gDFRhLghVevDoKrwMS2wUK", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": false},
@@ -9,15 +10,20 @@ const FB_COOKIES = [
     {"name": "datr", "value": "_X1rZXLEnaiQ1InGXamm_2lM", "domain": ".facebook.com", "path": "/", "secure": true, "httpOnly": false},
 ];
 
+// URLs المطلوبة
 const PAGE_URL = "https://www.facebook.com/profile.php?id=61564136097717";
 const GROUP_URL = "https://www.facebook.com/groups/2698034130415038/";
 const POST_CONTENT = "🚀 هذا منشور تجريبي للنشر التلقائي!";
 
+// وظيفة تشغيل البوت
 (async () => {
+    // تحديد المسار الصحيح لمتصفح Chrome في البيئة
+    const executablePath = '/usr/bin/google-chrome-stable'; // تأكد من أن هذا هو المسار الصحيح في بيئة Railway
+
     const browser = await puppeteer.launch({
         headless: true, 
-        executablePath: executablePath(), 
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        executablePath: executablePath, // تحديد مسار Chrome
+        args: ['--no-sandbox', '--disable-setuid-sandbox'] // لتجاوز بعض القيود في بيئة مثل Railway
     });
 
     const page = await browser.newPage();
