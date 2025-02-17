@@ -1,5 +1,5 @@
-# استخدام صورة Ubuntu كنظام تشغيل أساسي
-FROM ubuntu:20.04
+# استخدام صورة Ubuntu 22.04 لضمان التوافق مع Puppeteer
+FROM ubuntu:22.04
 
 # إعداد البيئة لتجنب الإدخال التفاعلي
 ENV DEBIAN_FRONTEND=noninteractive
@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip
 
-# تحميل وتثبيت Google Chrome
+# تثبيت Google Chrome
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
     dpkg -i google-chrome-stable_current_amd64.deb && \
     apt-get -f install -y
@@ -45,7 +45,7 @@ WORKDIR /app
 # نسخ الملفات من الجهاز المحلي إلى الحاوية
 COPY . /app
 
-# تثبيت الحزم في package.json مع جمع جميع الملفات المؤقتة
+# حذف الملفات المؤقتة وتثبيت الحزم في package.json مع إضافة Puppeteer
 RUN rm -rf node_modules package-lock.json && \
     npm install --legacy-peer-deps && \
     npm install puppeteer --legacy-peer-deps
