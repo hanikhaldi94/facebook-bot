@@ -1,6 +1,7 @@
 import time
 import tempfile
 import os
+import shutil
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -98,4 +99,4 @@ finally:
         driver.quit()
     # تنظيف مجلد البيانات المؤقت بعد الانتهاء
     if os.path.exists(user_data_dir):
-        os.rmdir(user_data_dir)
+        shutil.rmtree(user_data_dir)
