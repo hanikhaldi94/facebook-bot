@@ -13,18 +13,15 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # تثبيت Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16'  # يمكنك تعديل الإصدار حسب الحاجة
+          node-version: '16' 
 
-      # تثبيت التبعيات باستخدام npm
       - name: Install dependencies
         run: |
           npm install
 
-      # تعيين المتغيرات البيئية
       - name: Set environment variables
         run: |
           echo "FB_COOKIES=${{ secrets.FB_COOKIES }}" >> $GITHUB_ENV
@@ -32,6 +29,5 @@ jobs:
           echo "GROUP_URL=${{ secrets.GROUP_URL }}" >> $GITHUB_ENV
           echo "POST_CONTENT=${{ secrets.POST_CONTENT }}" >> $GITHUB_ENV
 
-      # تشغيل bot.js باستخدام Node.js
       - name: Run bot.js
         run: node bot.js
