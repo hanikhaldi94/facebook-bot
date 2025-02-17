@@ -1,4 +1,5 @@
 import time
+import tempfile
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -26,8 +27,14 @@ options.add_argument("--disable-gpu")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--disable-crash-reporter")
 options.add_argument("--disable-backgrounding-occluded-windows")
-options.add_argument("--headless=new")  # تشغيل المتصفح بدون واجهة
+options.add_argument("--headless")  # تشغيل المتصفح بدون واجهة
 options.add_argument("--incognito")  # تشغيل المتصفح في وضع التصفح الخفي (Incognito)
+
+# إنشاء مجلد بيانات مؤقت فريد
+user_data_dir = tempfile.mkdtemp()
+
+# إضافة خيار `user-data-dir` مع المسار المؤقت
+options.add_argument(f"--user-data-dir={user_data_dir}")
 
 # تشغيل المتصفح
 try:
