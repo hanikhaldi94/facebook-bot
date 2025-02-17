@@ -12,6 +12,13 @@ from selenium.webdriver.support import expected_conditions as EC
 # استبدال البيانات في الكوكيز
 FB_COOKIES = [
     {"name": "c_user", "value": "100005694367110", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
+    {"name": "datr", "value": "xerKZkgrzmFkzN468jcjg76L", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
+    {"name": "fr", "value": "1uHf2lvHJbQdZ3xbn.AWW9Ig0LIu3idsSiBUed3IFoWKOaR6EID3_Q6w.BnsuUO..AAA.0.0.BnsxHl.AWWOKwkesnM", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
+    {"name": "i_user", "value": "61564136097717", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
+    {"name": "ps_l", "value": "1", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
+    {"name": "ps_n", "value": "1", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
+    {"name": "sb", "value": "xerKZpIySD7K9J_v7IYZxnaM", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
+    {"name": "wd", "value": "1920x953", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
     {"name": "XS", "value": "36%3A8ml2jGQRRpfEaA%3A2%3A1739786751%3A-1%3A1051", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False}
 ]
 
@@ -21,10 +28,14 @@ POST_CONTENT = "هذا هو المحتوى الذي سيتم نشره في ال�
 
 # إعداد الـ WebDriver
 options = webdriver.ChromeOptions()
+# إزالة `--headless` للتشغيل مع واجهة رسومية (اختياري)
+# options.add_argument("--headless")
 options.add_argument("--no-sandbox")  # لتجنب مشاكل في بيئات الحاويات مثل Docker
+options.add_argument("--disable-dev-shm-usage")  # لتجنب مشاكل الذاكرة المشتركة
+options.add_argument("--remote-debugging-port=9222")  # إضافة منفذ تصحيح عن بعد
 
 # تحديد مجلد بيانات المستخدم الفريد باستخدام uuid لضمان أنه لا يتكرر
-user_data_dir = f"/tmp/chrome_user_data_{uuid.uuid4().hex}"
+user_data_dir = "/tmp/chrome_user_data"  # استخدام مسار مؤقت داخل الـ container
 
 # حذف المجلد إذا كان موجودًا من الجلسات السابقة
 if os.path.exists(user_data_dir):
