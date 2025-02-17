@@ -1,7 +1,4 @@
 import time
-import tempfile
-import os
-import shutil
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -30,10 +27,7 @@ options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--disable-crash-reporter")
 options.add_argument("--disable-backgrounding-occluded-windows")
 options.add_argument("--headless=new")  # تشغيل المتصفح بدون واجهة
-
-# إنشاء مجلد مؤقت فريد لكل جلسة
-user_data_dir = tempfile.mkdtemp()
-options.add_argument(f"--user-data-dir={user_data_dir}")
+options.add_argument("--incognito")  # تشغيل المتصفح في وضع التصفح الخفي (Incognito)
 
 # تشغيل المتصفح
 try:
@@ -97,6 +91,3 @@ except Exception as e:
 finally:
     if 'driver' in locals():
         driver.quit()
-    # تنظيف مجلد البيانات المؤقت بعد الانتهاء
-    if os.path.exists(user_data_dir):
-        shutil.rmtree(user_data_dir)
