@@ -79,15 +79,12 @@ try:
 
     print("تم نشر المنشور بنجاح!")
 
-    # الحصول على ID المنشور
+    # الحصول على ID المنشور باستخدام طريقة أخرى
     post_id_script = """
-    let post = document.querySelector('[role="feed"]');
-    if (post) {
-        let postLink = post.querySelector('a[href*="posts/"]');
-        if (postLink) {
-            let postId = postLink.href.split('/').pop();
-            return postId;
-        }
+    let postLink = document.querySelector('a[href*="posts/"]');
+    if (postLink) {
+        let postId = postLink.href.split('/').pop();
+        return postId;
     }
     return null;
     """
