@@ -10,8 +10,16 @@ import json
 # استبدل هنا بالكود الخاص بك
 FB_COOKIES = [
     {"name": "c_user", "value": "100005694367110", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
-    {"name": "xs", "value": "16%3AU-Tj7sI8IGDY3g%3A2%3A1733396952%3A-1%3A1051%3AxrrDo0mjoqB6vw%3AAcXLYyYbztJKBbHYGnCjD7gDFRhLghVevDoKrwMS2wUK", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False}
+    {"name": "datr", "value": "xerKZkgrzmFkzN468jcjg76L", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
+    {"name": "fr", "value": "1uHf2lvHJbQdZ3xbn.AWW9Ig0LIu3idsSiBUed3IFoWKOaR6EID3_Q6w.BnsuUO..AAA.0.0.BnsxHl.AWWOKwkesnM", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
+    {"name": "i_user", "value": "61564136097717", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
+    {"name": "ps_l", "value": "1", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
+    {"name": "ps_n", "value": "1", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
+    {"name": "sb", "value": "xerKZpIySD7K9J_v7IYZxnaM", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
+    {"name": "wd", "value": "1920x953", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
+    {"name": "XS", "value": "36%3A8ml2jGQRRpfEaA%3A2%3A1739786751%3A-1%3A1051", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False}
 ]
+
 GROUP_URL = "https://www.facebook.com/groups/2698034130415038/"
 PAGE_URL = "https://www.facebook.com/profile.php?id=61564136097717"
 POST_CONTENT = "هذا هو المحتوى الذي سيتم نشره في المجموعة."
@@ -22,7 +30,7 @@ options.add_argument("--headless")  # لتشغيل المتصفح بدون وا�
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 # تحميل الكوكيز
-driver.get("https://www.facebook.com/")
+driver.get("https://www.facebook.com/")  # فتح الفيسبوك أولاً
 for cookie in FB_COOKIES:
     driver.add_cookie(cookie)
 
