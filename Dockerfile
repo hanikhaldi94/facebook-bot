@@ -1,4 +1,4 @@
-# استخدام صورة Ubuntu كنظام تشغيل أساسي
+# استخدام صورة صغيرة من Ubuntu لتقليل الحجم
 FROM ubuntu:20.04
 
 # تحديث الحزم الأساسية وتثبيت الأدوات المطلوبة
@@ -19,7 +19,8 @@ RUN apt-get update && apt-get install -y \
     xdg-utils \
     libgbm1 \
     libvulkan1 \
-    libx11-xcb1
+    libx11-xcb1 \
+    xvfb
 
 # تحميل وتثبيت Google Chrome
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
