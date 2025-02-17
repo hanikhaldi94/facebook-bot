@@ -1,66 +1,72 @@
-import json
 import time
-import tempfile
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
 
-# ✅ كوكيز فيسبوك الحقيقية (حاليًا للتجريب فقط)
+# ✅ تعريف الكوكيز الخاصة بحسابك مباشرةً
 FB_COOKIES = [
-    {"name": "c_user", "value": "100005694367110", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False},
-    {"name": "xs", "value": "16%3AU-Tj7sI8IGDY3g%3A2%3A1733396952%3A-1%3A1051%3AxrrDo0mjoqB6vw%3AAcXLYyYbztJKBbHYGnCjD7gDFRhLghVevDoKrwMS2wUK", "domain": ".facebook.com", "path": "/", "secure": True, "httpOnly": False}
+    {"name": "c_user", "value": "100005694367110", "domain": ".facebook.com", "path": "/", "secure": True},
+    {"name": "xs", "value": "24%3AOtkShu0keCrL3A%3A2%3A1739742595%3A-1%3A1051%3A%3AAcU55dwuLfb9kOjznYaChsdoykCbrAYMnTaEBERD1Q", "domain": ".facebook.com", "path": "/", "secure": True},
+    {"name": "fr", "value": "1g9dQxf6nkkx1mqfL.AWUxTSE8S0iNwwdkqR958d8_sl1ogzjNtJRR9Q.Bns28q..AAA.0.0.Bns28q.AWVRew9xDFU", "domain": ".facebook.com", "path": "/", "secure": True},
+    {"name": "sb", "value": "x31rZRY5h2hhr5cT5N3xs_sR", "domain": ".facebook.com", "path": "/", "secure": True},
+    {"name": "datr", "value": "_X1rZXLEnaiQ1InGXamm_2lM", "domain": ".facebook.com", "path": "/", "secure": True}
 ]
 
-# ✅ رابط الصفحة التي تديرها
+# ✅ رابط الصفحة والمجموعة
 PAGE_URL = "https://www.facebook.com/profile.php?id=61564136097717"
-
-# ✅ رابط المجموعة التي يمكن للصفحة النشر فيها
 GROUP_URL = "https://www.facebook.com/groups/2698034130415038/"
+POST_CONTENT = "🚀 هذا منشور تجريبي للنشر التلقائي من البوت!"
 
-# ✅ محتوى المنشور
-POST_CONTENT = "🚀 هذا منشور تجريبي للنشر التلقائي!"
-
-# إعداد WebDriver
+# ✅ إعداد WebDriver
 options = webdriver.ChromeOptions()
+options.add_argument("--headless")  # تشغيل بدون واجهة رسومية
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
-options.add_argument("--remote-debugging-port=9222")
 
-# تخصيص مجلد مؤقت لمتصفح كروم
-user_data_dir = tempfile.mkdtemp()
-options.add_argument(f"--user-data-dir={user_data_dir}")
+# ✅ تشغيل المتصفح
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 try:
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
-    # فتح فيسبوك وتحميل الكوكيز
+    # 1️⃣ فتح فيسبوك وتحميل الكوكيز
     driver.get("https://www.facebook.com/")
-    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, "body")))
-
     for cookie in FB_COOKIES:
         driver.add_cookie(cookie)
 
-    # الانتقال إلى الصفحة للتحقق من تسجيل الدخول
+    # 2️⃣ الانتقال إلى الصفحة
     driver.get(PAGE_URL)
-    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, "body")))
+    time.sleep(3)  # انتظار تحميل الصفحة
 
-    # الانتقال إلى المجموعة
+    # 3️⃣ التبديل للصفحة إذا كانت متاحة
+    try:
+        switch_button = WebDriverWait(driver, 5).until(
+            EC.element_to_be_clickable((By.XPATH, "//span[contains(text(), 'التبديل إلى')]"))
+        )
+        switch_button.click()
+        time.sleep(3)  # انتظار التبديل
+    except:
+        print("✅ لا يوجد تبديل للصفحة، متابعة النشر مباشرة.")
+
+    # 4️⃣ الانتقال إلى المجموعة
     driver.get(GROUP_URL)
-    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, '[role="textbox"]')))
+    time.sleep(3)
 
-    # البحث عن مربع النص وإدخال المحتوى
-    post_box = driver.find_element(By.CSS_SELECTOR, '[role="textbox"]')
+    # 5️⃣ انتظار مربع الكتابة وكتابة المنشور
+    post_box = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, '[role="textbox"]'))
+    )
     post_box.send_keys(POST_CONTENT)
 
-    # انتظار زر "نشر" والضغط عليه
-    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'div[aria-label="نشر"]'))).click()
+    # 6️⃣ الضغط على زر النشر
+    post_button = WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, 'div[aria-label="نشر"]'))
+    )
+    post_button.click()
 
-    # الانتظار قليلاً للتأكد من نجاح النشر
+    # 7️⃣ الانتظار والتأكد من النشر
     time.sleep(5)
-
     print("✅ تم نشر المنشور بنجاح!")
 
 except Exception as e:
