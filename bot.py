@@ -19,7 +19,7 @@ FB_COOKIES = [
 # الرابط الخاص بالصفحة والمجموعة
 PAGE_URL = "https://www.facebook.com/profile.php?id=61564136097717"
 GROUP_URL = "https://www.facebook.com/groups/2698034130415038/"
-POST_CONTENT = "هذا هو المحتوى الذي سيتم نشره في المجموعة."
+POST_CONTENT = "🚀 هذا منشور تجريبي للنشر التلقائي!"
 
 # إعدادات WebDriver
 options = webdriver.ChromeOptions()
@@ -28,6 +28,9 @@ options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--disable-crash-reporter")
 options.add_argument("--disable-backgrounding-occluded-windows")
 options.add_argument("--headless=new")  # تشغيل المتصفح بدون واجهة
+
+# تحديد مجلد مخصص لبيانات المستخدم
+options.add_argument("--user-data-dir=/tmp/chrome-user-data")  # يمكنك تخصيص المسار كما تريد
 
 # تشغيل المتصفح
 try:
