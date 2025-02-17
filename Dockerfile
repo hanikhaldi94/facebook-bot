@@ -1,4 +1,4 @@
-# استخدام صورة صغيرة من Ubuntu لتقليل الحجم
+# استخدام صورة Ubuntu كنظام تشغيل أساسي
 FROM ubuntu:20.04
 
 # إعداد البيئة لتجنب الإدخال التفاعلي
@@ -23,7 +23,9 @@ RUN apt-get update && apt-get install -y \
     libgbm1 \
     libvulkan1 \
     libx11-xcb1 \
-    xvfb
+    xvfb \
+    python3 \
+    python3-pip
 
 # تحميل وتثبيت Google Chrome
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
@@ -34,9 +36,8 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
     apt-get install -y nodejs
 
-# تثبيت Puppeteer
-RUN rm -rf node_modules package-lock.json && \
-    npm install puppeteer
+# تحديث npm إلى آخر إصدار
+RUN npm install -g npm@latest
 
 # إعدادات العمل
 WORKDIR /app
@@ -44,8 +45,10 @@ WORKDIR /app
 # نسخ الملفات من الجهاز المحلي إلى الحاوية
 COPY . /app
 
-# تثبيت الحزم في package.json
-RUN npm install
+# تثبيت الحزم في package.json مع جمع جميع الملفات المؤقتة
+RUN rm -rf node_modules package-lock.json && \
+    npm install --legacy-peer-deps && \
+    npm install puppeteer --legacy-peer-deps
 
 # تنفيذ التطبيق عند تشغيل الحاوية
 CMD ["node", "bot.js"]
