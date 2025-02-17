@@ -1,6 +1,5 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait
@@ -30,32 +29,36 @@ for cookie in FB_COOKIES:
 # الانتقال إلى صفحة المجموعة
 driver.get(GROUP_URL)
 
-# الانتظار حتى تظهر نافذة الكتابة
-WebDriverWait(driver, 10).until(
-    EC.presence_of_element_located((By.CSS_SELECTOR, '[role="textbox"]'))
-)
+# زيادة الوقت المسموح به للانتظار
+try:
+    # الانتظار حتى تظهر نافذة الكتابة
+    WebDriverWait(driver, 20).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, '[role="textbox"]'))
+    )
 
-# العثور على مربع النص والكتابة فيه
-post_box = driver.find_element(By.CSS_SELECTOR, '[role="textbox"]')
-post_box.send_keys(POST_CONTENT)
+    # العثور على مربع النص والكتابة فيه
+    post_box = driver.find_element(By.CSS_SELECTOR, '[role="textbox"]')
+    post_box.send_keys(POST_CONTENT)
 
-# الضغط على زر النشر
-WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.CSS_SELECTOR, 'div[aria-label="نشر"]'))
-).click()
+    # الضغط على زر النشر
+    WebDriverWait(driver, 20).until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, 'div[aria-label="نشر"]'))
+    ).click()
 
-# الانتظار قليلاً للتحقق من النشر
-time.sleep(3)
+    # الانتظار قليلاً للتحقق من النشر
+    time.sleep(3)
 
-# استخراج الـ ID المنشور من الرابط
-# قد تحتاج إلى استخدام طريقة أخرى مثل التحقق من الـ DOM بعد النشر
-post_url = driver.current_url
+    # استخراج الـ ID المنشور من الرابط
+    post_url = driver.current_url
 
-# طباعة نتائج النشر
-if post_url:
-    print(f"تم نشر المنشور بنجاح! رابط المنشور: {post_url}")
-else:
-    print("لم يتم نشر المنشور.")
+    # طباعة نتائج النشر
+    if post_url:
+        print(f"تم نشر المنشور بنجاح! رابط المنشور: {post_url}")
+    else:
+        print("لم يتم نشر المنشور.")
+
+except Exception as e:
+    print(f"حدث خطأ: {e}")
 
 # إغلاق المتصفح
 driver.quit()
