@@ -1,13 +1,13 @@
 import uuid
 import os
 import shutil
+import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import time
 
 # استبدال البيانات في الكوكيز
 FB_COOKIES = [
@@ -30,9 +30,8 @@ POST_CONTENT = "هذا هو المحتوى الذي سيتم نشره في ال�
 options = webdriver.ChromeOptions()
 options.add_argument("--headless")  # لتشغيل المتصفح بدون واجهة رسومية
 
-# تحديد مجلد بيانات المستخدم الفريد لكل جلسة
-unique_id = str(uuid.uuid4())  # إنشاء معرف فريد
-user_data_dir = f"/tmp/chrome_user_data_{unique_id}"  # مسار مجلد بيانات المستخدم الفريد
+# تحديد مجلد بيانات المستخدم الفريد باستخدام الطابع الزمني
+user_data_dir = f"/tmp/chrome_user_data_{int(time.time())}"  # استخدام الوقت الحالي لتوليد مسار فريد
 
 # حذف المجلد إذا كان موجودًا من الجلسات السابقة
 if os.path.exists(user_data_dir):
