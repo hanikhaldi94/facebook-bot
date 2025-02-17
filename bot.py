@@ -66,7 +66,7 @@ try:
     }
     """
     driver.execute_script(post_script, POST_CONTENT)
-    time.sleep(2)
+    time.sleep(3)  # إضافة تأخير أكبر هنا
 
     # الضغط على زر النشر
     post_button_script = """
@@ -76,6 +76,7 @@ try:
     }
     """
     driver.execute_script(post_button_script)
+    time.sleep(5)  # إضافة تأخير أطول للتأكد من نشر المنشور
 
     print("تم نشر المنشور بنجاح!")
 
