@@ -25,45 +25,51 @@ POST_CONTENT = "هذا هو المحتوى الذي سيتم نشره في ال�
 options = webdriver.ChromeOptions()
 options.add_argument("--disable-gpu")
 options.add_argument("--disable-dev-shm-usage")
-options.add_argument("--no-sandbox")
-options.add_argument("window-size=1920x1080")  # ضبط نافذة المتصفح
-
-# استخدام مجلد مؤقت لتخزين البيانات
-user_data_dir = tempfile.mkdtemp()
-options.add_argument(f"--user-data-dir={user_data_dir}")
-options.add_argument("--headless")  # إذا كنت تحتاج إلى تشغيل المتصفح بدون واجهة
+options.add_argument("--disable-crash-reporter")
+options.add_argument("--disable-backgrounding-occluded-windows")
+options.add_argument("--headless=new")  # تشغيل المتصفح بدون واجهة
 
 # تشغيل المتصفح
 try:
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
-    # فتح صفحة فيسبوك وتسجيل الدخول باستخدام الكوكيز
+    # فتح فيسبوك وتسجيل الدخول بالكوكيز
     driver.get("https://www.facebook.com/")
     WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, "body")))
 
     for cookie in FB_COOKIES:
         driver.add_cookie(cookie)
 
+    # تحديث الصفحة بعد إضافة الكوكيز
+    driver.refresh()
+    WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, "body")))
+
     # الانتقال إلى صفحة الحساب الشخصية
     driver.get(PAGE_URL)
     WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CSS_SELECTOR, "body")))
 
-    # انتظار التحميل الكامل للصفحة
-    time.sleep(5)
-
-    # التبديل إلى الصفحة باستخدام JavaScript
+    # التبديل إلى الصفحة (باستخدام JavaScript بدلاً من XPath)
     try:
-        driver.execute_script('''
+        time.sleep(5)  # انتظار تحميل الصفحة بالكامل
+
+        switch_button_js = """
             let buttons = document.querySelectorAll('span');
             for (let btn of buttons) {
-                if (btn.innerText.includes("تبديل الآن")) {
+                if (btn.innerText.includes('تبديل الآن')) {
                     btn.click();
-                    break;
+                    return true;
                 }
             }
-        ''')
-        time.sleep(5)
-        print("✅ تم التبديل إلى الصفحة بنجاح.")
+            return false;
+        """
+        switched = driver.execute_script(switch_button_js)
+        if switched:
+            print("✅ تم التبديل إلى الصفحة بنجاح.")
+        else:
+            print("⚠️ لم يتم العثور على زر التبديل.")
+        
+        time.sleep(5)  # التأكد من اكتمال العملية
+
     except Exception as e:
         print(f"❌ خطأ أثناء التبديل للصفحة: {e}")
 
