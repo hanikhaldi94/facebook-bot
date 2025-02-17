@@ -3,7 +3,6 @@ import chromedriver_autoinstaller
 # تأكد من تثبيت ChromeDriver المناسب للإصدار الحالي من Google Chrome
 chromedriver_autoinstaller.install()
 
-
 import os
 import json
 import time
@@ -34,7 +33,7 @@ chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 
 # ✅ تشغيل المتصفح
-service = Service(chromedriver_autoinstaller.install())  # تأكد من المسار الصحيح لـ ChromeDriver
+service = Service(chromedriver_autoinstaller.install())  # سيتم تثبيت chromedriver تلقائيًا
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
 try:
