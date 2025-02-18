@@ -1,4 +1,4 @@
-# استخدام صورة خفيفة لتسريع البناء
+# استخدام Node.js مع Debian Slim لتقليل الحجم
 FROM node:20-slim
 
 # تثبيت المتطلبات الأساسية
@@ -23,14 +23,18 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
     apt-get install -y ./google-chrome-stable_current_amd64.deb && \
     rm google-chrome-stable_current_amd64.deb
 
-# تعيين مجلد العمل داخل الحاوية
+# تعيين مجلد العمل
 WORKDIR /app
 
 # نسخ الملفات
-COPY . /app
-
-# تثبيت الحزم المطلوبة
+COPY package.json package-lock.json ./
 RUN npm install
 
-# تنفيذ التطبيق عند تشغيل الحاوية
+# نسخ باقي الملفات
+COPY . .
+
+# تعيين الأذونات (قد تكون ضرورية في بعض الأحيان)
+RUN chmod -R 777 /app
+
+# تشغيل التطبيق
 CMD ["node", "bot.js"]
