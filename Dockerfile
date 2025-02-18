@@ -1,21 +1,21 @@
-# استخدم صورة رسمية تحتوي على Node.js و Puppeteer مدمجين مسبقًا
+# استخدم صورة رسمية لـ Puppeteer
 FROM ghcr.io/puppeteer/puppeteer:latest
 
 # تحديد مجلد العمل داخل الحاوية
 WORKDIR /app
 
-# نسخ ملفات المشروع إلى الحاوية
-COPY package.json package-lock.json ./
+# نسخ فقط package.json (بدون package-lock.json لتجنب الخطأ)
+COPY package.json ./
 
-# تثبيت الحزم المطلوبة
-RUN npm install
+# تثبيت الحزم المطلوبة وإنشاء package-lock.json تلقائيًا
+RUN npm install --package-lock-only && npm install
 
-# نسخ باقي الملفات إلى الحاوية
+# نسخ باقي ملفات المشروع
 COPY . .
 
-# تعيين المتغيرات البيئية لتشغيل Puppeteer بدون مشاكل
+# تعيين المتغيرات البيئية لتجنب مشاكل Puppeteer
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-# تشغيل السكريبت الأساسي
+# تشغيل البوت
 CMD ["node", "bot.js"]
