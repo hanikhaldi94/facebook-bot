@@ -1,8 +1,5 @@
-# استخدام صورة Ubuntu 22.04 لضمان التوافق مع Puppeteer
-FROM ubuntu:22.04
-
-# إعداد البيئة لتجنب الإدخال التفاعلي
-ENV DEBIAN_FRONTEND=noninteractive
+# استخدام صورة Ubuntu كنظام تشغيل أساسي
+FROM ubuntu:20.04
 
 # تحديث الحزم الأساسية وتثبيت الأدوات المطلوبة
 RUN apt-get update && apt-get install -y \
@@ -21,34 +18,27 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     xdg-utils \
     libgbm1 \
-    libvulkan1 \
-    libx11-xcb1 \
-    xvfb \
-    python3 \
-    python3-pip
+    libvulkan1
 
-# تثبيت Google Chrome
+# تحميل وتثبيت Google Chrome
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    dpkg -i google-chrome-stable_current_amd64.deb && \
-    apt-get -f install -y
+    dpkg -i google-chrome-stable_current_amd64.deb || apt-get -f install -y
 
-# تثبيت Node.js و npm
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
+# تثبيت Node.js 20 والإصدارات المتوافقة
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 
-# تحديث npm إلى آخر إصدار
+# تحديث npm إلى أحدث إصدار متوافق
 RUN npm install -g npm@latest
 
-# إعدادات العمل
+# إعداد مجلد العمل داخل الحاوية
 WORKDIR /app
 
 # نسخ الملفات من الجهاز المحلي إلى الحاوية
 COPY . /app
 
-# حذف الملفات المؤقتة وتثبيت الحزم في package.json مع إضافة Puppeteer
-RUN rm -rf node_modules package-lock.json && \
-    npm install --legacy-peer-deps && \
-    npm install puppeteer --legacy-peer-deps
+# تثبيت الحزم المطلوبة
+RUN npm install
 
 # تنفيذ التطبيق عند تشغيل الحاوية
 CMD ["node", "bot.js"]
