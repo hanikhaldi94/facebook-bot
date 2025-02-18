@@ -1,12 +1,11 @@
-# استخدام صورة Ubuntu كنظام تشغيل أساسي
-FROM ubuntu:20.04
+# استخدام صورة خفيفة لتسريع البناء
+FROM node:20-slim
 
-# تحديث الحزم الأساسية وتثبيت الأدوات المطلوبة
+# تثبيت المتطلبات الأساسية
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
     ca-certificates \
-    gnupg \
     fonts-liberation \
     libappindicator3-1 \
     libasound2 \
@@ -15,26 +14,19 @@ RUN apt-get update && apt-get install -y \
     libxss1 \
     libgdk-pixbuf2.0-0 \
     libnss3 \
-    lsb-release \
-    xdg-utils \
     libgbm1 \
-    libvulkan1
+    libvulkan1 \
+    && rm -rf /var/lib/apt/lists/*
 
 # تحميل وتثبيت Google Chrome
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    dpkg -i google-chrome-stable_current_amd64.deb || apt-get -f install -y
+    apt-get install -y ./google-chrome-stable_current_amd64.deb && \
+    rm google-chrome-stable_current_amd64.deb
 
-# تثبيت Node.js 20 والإصدارات المتوافقة
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install -y nodejs
-
-# تحديث npm إلى أحدث إصدار متوافق
-RUN npm install -g npm@latest
-
-# إعداد مجلد العمل داخل الحاوية
+# تعيين مجلد العمل داخل الحاوية
 WORKDIR /app
 
-# نسخ الملفات من الجهاز المحلي إلى الحاوية
+# نسخ الملفات
 COPY . /app
 
 # تثبيت الحزم المطلوبة
