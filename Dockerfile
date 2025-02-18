@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package.json ./
 
 # تثبيت الحزم
-RUN npm install
+RUN npm install --package-lock-only && npm install
 
 # نسخ باقي الملفات
 COPY . .
